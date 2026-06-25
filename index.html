@@ -238,10 +238,9 @@
         const date  = document.getElementById('dateInput').value;
         if(!date){ alert("দয়া করে একটি তারিখ সিলেক্ট করো!"); return; }
 
-        emailjs.send('service_49e6i12', 'template_xw8m0x4', {
+        emailjs.send('service_49e6i12', 'template_h73zcxn', {
             place: place,
             date: date,
-            name: 'Date Invite',
             email: 'cine45ma@gmail.com'
         }).then(function(){
             console.log('Email sent!');
