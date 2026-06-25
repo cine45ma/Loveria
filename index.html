@@ -240,11 +240,14 @@
 
         emailjs.send('service_49e6i12', 'template_xw8m0x4', {
             place: place,
-            date: date
+            date: date,
+            name: 'Date Invite',
+            email: 'cine45ma@gmail.com'
         }).then(function(){
             console.log('Email sent!');
         }, function(error){
-            console.log('Email error:', error);
+            console.log('Email error:', JSON.stringify(error));
+            alert('Email error: ' + JSON.stringify(error));
         });
 
         nextScreen(4);
