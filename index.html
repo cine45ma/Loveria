@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>একটি বিশেষ আমন্ত্রণ ❤️</title>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -19,8 +20,6 @@
             position: relative;
             background: #1a0010;
         }
-
-        /* ── Flower background canvas ── */
         #bg {
             position: fixed;
             top: 0; left: 0;
@@ -28,7 +27,6 @@
             pointer-events: none;
             z-index: 0;
         }
-
         .container {
             position: relative;
             z-index: 1;
@@ -42,7 +40,6 @@
         }
         h1 { color: #e0185a; font-size: 23px; margin-bottom: 20px; line-height: 1.4; }
         p  { color: #444; font-size: 17px; line-height: 1.6; }
-
         .btn-group {
             display: flex;
             justify-content: center;
@@ -64,7 +61,6 @@
         button:active { transform: scale(0.96); }
         #yesBtn { background: linear-gradient(135deg,#ff4d6d,#ff85a1); color: white; box-shadow: 0 4px 14px rgba(255,77,109,0.4); }
         #noBtn  { background-color: #aaa; color: white; position: absolute; left: 55%; }
-
         select, input[type="date"] {
             width: 85%;
             padding: 11px 14px;
@@ -93,8 +89,6 @@
         .hidden { display: none; }
         .heart-anim { font-size: 52px; animation: beat 0.65s infinite alternate; display: block; margin-bottom: 10px; }
         @keyframes beat { to { transform: scale(1.18); } }
-
-        /* falling petals */
         .petal {
             position: fixed;
             top: -40px;
@@ -112,7 +106,6 @@
 </head>
 <body>
 
-<!-- animated background -->
 <canvas id="bg"></canvas>
 
 <div class="container" id="box">
@@ -157,100 +150,107 @@
 </div>
 
 <script>
-/* ── falling petals ── */
-const petals = ['🌸','🌺','🌹','🌷','💐','🌼'];
-for(let i = 0; i < 18; i++){
-    const p = document.createElement('div');
-    p.className = 'petal';
-    p.textContent = petals[Math.floor(Math.random()*petals.length)];
-    p.style.left = Math.random()*100 + 'vw';
-    p.style.fontSize = (16 + Math.random()*18) + 'px';
-    const dur = 6 + Math.random()*8;
-    p.style.animationDuration = dur + 's';
-    p.style.animationDelay = (-Math.random()*dur) + 's';
-    document.body.appendChild(p);
-}
+    emailjs.init('TAGXfhZ6xKY_tsRaJ0v4-');
 
-/* ── canvas background: glowing flowers & hearts ── */
-const canvas = document.getElementById('bg');
-const ctx = canvas.getContext('2d');
-let W, H, flowers = [];
+    const petals = ['🌸','🌺','🌹','🌷','💐','🌼'];
+    for(let i = 0; i < 18; i++){
+        const p = document.createElement('div');
+        p.className = 'petal';
+        p.textContent = petals[Math.floor(Math.random()*petals.length)];
+        p.style.left = Math.random()*100 + 'vw';
+        p.style.fontSize = (16 + Math.random()*18) + 'px';
+        const dur = 6 + Math.random()*8;
+        p.style.animationDuration = dur + 's';
+        p.style.animationDelay = (-Math.random()*dur) + 's';
+        document.body.appendChild(p);
+    }
 
-function resize(){
-    W = canvas.width  = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-}
-resize();
-window.addEventListener('resize', resize);
+    const canvas = document.getElementById('bg');
+    const ctx = canvas.getContext('2d');
+    let W, H, flowers = [];
 
-function randFlower(){
-    return {
-        x: Math.random()*W,
-        y: Math.random()*H,
-        r: 18 + Math.random()*28,
-        petals: 5 + Math.floor(Math.random()*3),
-        hue: Math.random()<0.5 ? (330+Math.random()*30) : (280+Math.random()*40),
-        alpha: 0.12 + Math.random()*0.18,
-        speed: 0.0003 + Math.random()*0.0004,
-        phase: Math.random()*Math.PI*2
-    };
-}
+    function resize(){
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
 
-for(let i=0;i<28;i++) flowers.push(randFlower());
+    function randFlower(){
+        return {
+            x: Math.random()*W,
+            y: Math.random()*H,
+            r: 18 + Math.random()*28,
+            petals: 5 + Math.floor(Math.random()*3),
+            hue: Math.random()<0.5 ? (330+Math.random()*30) : (280+Math.random()*40),
+            alpha: 0.12 + Math.random()*0.18,
+            speed: 0.0003 + Math.random()*0.0004,
+            phase: Math.random()*Math.PI*2
+        };
+    }
 
-function drawFlower(f, t){
-    ctx.save();
-    ctx.translate(f.x, f.y);
-    ctx.rotate(f.phase + t*f.speed);
-    const n = f.petals;
-    ctx.globalAlpha = f.alpha;
-    for(let i=0;i<n;i++){
+    for(let i=0;i<28;i++) flowers.push(randFlower());
+
+    function drawFlower(f, t){
         ctx.save();
-        ctx.rotate((Math.PI*2/n)*i);
+        ctx.translate(f.x, f.y);
+        ctx.rotate(f.phase + t*f.speed);
+        const n = f.petals;
+        ctx.globalAlpha = f.alpha;
+        for(let i=0;i<n;i++){
+            ctx.save();
+            ctx.rotate((Math.PI*2/n)*i);
+            ctx.beginPath();
+            ctx.ellipse(0, -f.r*0.6, f.r*0.28, f.r*0.6, 0, 0, Math.PI*2);
+            ctx.fillStyle = `hsl(${f.hue},80%,72%)`;
+            ctx.fill();
+            ctx.restore();
+        }
         ctx.beginPath();
-        ctx.ellipse(0, -f.r*0.6, f.r*0.28, f.r*0.6, 0, 0, Math.PI*2);
-        ctx.fillStyle = `hsl(${f.hue},80%,72%)`;
+        ctx.arc(0,0,f.r*0.22,0,Math.PI*2);
+        ctx.fillStyle = `hsl(${f.hue+20},90%,88%)`;
         ctx.fill();
         ctx.restore();
     }
-    ctx.beginPath();
-    ctx.arc(0,0,f.r*0.22,0,Math.PI*2);
-    ctx.fillStyle = `hsl(${f.hue+20},90%,88%)`;
-    ctx.fill();
-    ctx.restore();
-}
 
-function loop(t){
-    ctx.clearRect(0,0,W,H);
-    flowers.forEach(f => drawFlower(f,t));
+    function loop(t){
+        ctx.clearRect(0,0,W,H);
+        flowers.forEach(f => drawFlower(f,t));
+        requestAnimationFrame(loop);
+    }
     requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
 
-/* ── no button escape ── */
-function moveNoButton(){
-    const noBtn = document.getElementById('noBtn');
-    const x = Math.random()*(window.innerWidth-150)-(window.innerWidth/2)+75;
-    const y = Math.random()*(window.innerHeight-100)-(window.innerHeight/2)+50;
-    noBtn.style.transform = `translate(${x}px,${y}px)`;
-}
+    function moveNoButton(){
+        const noBtn = document.getElementById('noBtn');
+        const x = Math.random()*(window.innerWidth-150)-(window.innerWidth/2)+75;
+        const y = Math.random()*(window.innerHeight-100)-(window.innerHeight/2)+50;
+        noBtn.style.transform = `translate(${x}px,${y}px)`;
+    }
 
-/* ── screen navigation ── */
-function nextScreen(num){
-    ['screen1','screen2','screen3','screen4'].forEach(id=>
-        document.getElementById(id).classList.add('hidden'));
-    document.getElementById('screen'+num).classList.remove('hidden');
-}
+    function nextScreen(num){
+        ['screen1','screen2','screen3','screen4'].forEach(id=>
+            document.getElementById(id).classList.add('hidden'));
+        document.getElementById('screen'+num).classList.remove('hidden');
+    }
 
-/* ── final submit ── */
-function finalSubmit(){
-    const place = document.getElementById('place').value;
-    const date  = document.getElementById('dateInput').value;
-    if(!date){ alert("দয়া করে একটি তারিখ সিলেক্ট করো!"); return; }
-    nextScreen(4);
-    document.getElementById('finalMessage').innerHTML =
-        `আমরা <b>${date}</b> তারিখে <b>${place}</b>-এ যাচ্ছি!<br>আমি অপেক্ষা করবো। ❤️`;
-}
+    function finalSubmit(){
+        const place = document.getElementById('place').value;
+        const date  = document.getElementById('dateInput').value;
+        if(!date){ alert("দয়া করে একটি তারিখ সিলেক্ট করো!"); return; }
+
+        emailjs.send('service_49e6i12', 'template_xw8m0x4', {
+            place: place,
+            date: date
+        }).then(function(){
+            console.log('Email sent!');
+        }, function(error){
+            console.log('Email error:', error);
+        });
+
+        nextScreen(4);
+        document.getElementById('finalMessage').innerHTML =
+            `আমরা <b>${date}</b> তারিখে <b>${place}</b>-এ যাচ্ছি!<br>আমি অপেক্ষা করবো। ❤️`;
+    }
 </script>
 </body>
 </html>
